@@ -15,11 +15,23 @@ Including another URLconf
 """
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from .views import *
+from rest_framework.routers import DefaultRouter
+
+model_viewset_router = DefaultRouter()
+model_viewset_router.register('books_model_router', BookModelViewSet, basename='books_model_router')
+
+viewset_router = DefaultRouter()
+viewset_router.register('books_viewset_router', BookViewSet, basename='books_viewset_router')
+
 
 urlpatterns = [
     path('books/',BookAPIView.as_view(), name='books'),
     path('books_details/<int:id>/', BookDetails.as_view(), name='books_details'), #here <int:id> id name is used the same must be used in BookDetails API Views
     path('generic_books/<int:pk>/', GenericAPIView.as_view(), name='generic_books'), #generic class variable name must be pk else set the `.lookup_field` attribute on the view correctly like lookup_field = 'id'
+    path('book_viewset/', include(viewset_router.urls)),
+    path('book_viewset/<int:pk>/', include(viewset_router.urls)),
+    path('book_model_viewset/', include(model_viewset_router.urls)),
+    
 ]

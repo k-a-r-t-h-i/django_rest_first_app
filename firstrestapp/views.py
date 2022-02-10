@@ -10,6 +10,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework import generics
 from rest_framework import mixins
+from rest_framework import viewsets
 
 
 class BookAPIView(APIView):
@@ -60,10 +61,10 @@ class GenericAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.Crea
 
     #lookup_field = 'id' when anyother name other than pk is used
 
-    def get(self, request, pk):
+    def get(self, request, pk = None):
         return self.retrieve(request)
 
-    def post(self, request, pk):
+    def post(self, request):
         return self.create(request)
 
     def put(self, request, pk):
@@ -73,7 +74,39 @@ class GenericAPIView(generics.GenericAPIView, mixins.ListModelMixin, mixins.Crea
         return self.destroy(request, pk)
 
     
+class BookViewSet(viewsets.ViewSet):
+    def list(self, request):
+        books = Book.objects.all()
+        serializer = BookSerializer(books, many = True)
+        return Response(serializer.data)
 
+    def create(self, request):
+        serializer = BookSerializer(data = request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
+
+    def retrieve(self, request, pk=None):   #if id is used lookup_field must be used
+        book = get_object_or_404(Book, id = pk)
+        serializer = BookSerializer(book, many = False)
+        return Response(serializer.data)
+    
+    def update(self, request, pk=None):
+        book = get_object_or_404(Book, id = pk)
+        serializer = BookSerializer(book, data = request.data)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
+
+
+class BookModelViewSet(viewsets.ModelViewSet):
+    
+    serializer_class = BookSerializer
+    queryset = Book.objects.all()
 
 
 # @api_view(['GET'])
