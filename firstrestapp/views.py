@@ -11,7 +11,11 @@ from rest_framework import status
 from rest_framework import generics
 from rest_framework import mixins
 from rest_framework import viewsets
+from rest_framework.permissions import IsAuthenticated
 
+# rest_framework_simplejwt module has to be installed separately using pip install djangorestframework_simplejwt
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
+from rest_framework_simplejwt.authentication import JWTAuthentication
 
 class BookAPIView(APIView):
 
@@ -107,6 +111,10 @@ class BookModelViewSet(viewsets.ModelViewSet):
     
     serializer_class = BookSerializer
     queryset = Book.objects.all()
+    permission_classes = [IsAuthenticated]
+    authentication_classes = [JWTAuthentication]
+
+
 
 
 # @api_view(['GET'])

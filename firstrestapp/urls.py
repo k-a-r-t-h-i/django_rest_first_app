@@ -18,6 +18,8 @@ from django.contrib import admin
 from django.urls import path, include
 from .views import *
 from rest_framework.routers import DefaultRouter
+# rest_framework_simplejwt module has to be installed separately using pip install djangorestframework_simplejwt
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
 model_viewset_router = DefaultRouter()
 model_viewset_router.register('books_model_router', BookModelViewSet, basename='books_model_router')
@@ -33,5 +35,9 @@ urlpatterns = [
     path('book_viewset/', include(viewset_router.urls)),
     path('book_viewset/<int:pk>/', include(viewset_router.urls)),
     path('book_model_viewset/', include(model_viewset_router.urls)),
+    #url with this /<int:pk>/ is not required for retrieve as model view set takes care of it
+    path('get_token/', TokenObtainPairView.as_view(), name='get_token'), #called first with usename and password in body as post request
+    path('refresh_token/', TokenRefreshView.as_view(), name='refresh_token'), 
+    path('verify_token/', TokenVerifyView.as_view(), name='verify_token'),
     
 ]
